@@ -1,5 +1,9 @@
 #include "memory_propigation.h"
 
+//Here is the flash ram for some propigation lists
+//It contains the from brolly and the to brolly indexes, as well as a delay
+//After each there is a wrapper object of type PropigationList that points to the list
+//and contains inexes and so on.
 PROGMEM prog_int16_t in_order_list[] = {
    0,1,100,
    1,2,100,
@@ -156,35 +160,40 @@ PROGMEM prog_int16_t reverse_order_list[] = {
 
 PropigationList reverse_order(reverse_order_list,sizeof(reverse_order_list) / (sizeof(prog_int16_t) * 3));
 
+//Here is the master sequence list
 PropigationList listOfLists[] = {reverse_order,in_order,sync};
 
+//Here is the object wrapper for the master sequence list
 MasterSequenceList masterSequenceList(sizeof(listOfLists) / sizeof(PropigationList),listOfLists);
 
+//This is the propigation list object constructor.  It takes a pointer to the list in flash ram and a size
 PropigationList::PropigationList(prog_int16_t* listPointer,  int sizeOfList){
   _listPointer = listPointer;
   _sizeOfList = sizeOfList;
 };
 
+//This returns the number of elements in the list, mostly for use in the master list
 int PropigationList::getNumberOfElements(){
   return _sizeOfList;
 };
 
+//This gets the 'from' brolly in the propigation list
 int PropigationList::getFrom(int address){
   return pgm_read_word_near(_listPointer + address * 3);
 };
 
+//This gets the 'to' brolly in the propigation list
 int PropigationList::getTo(int address){
   int returnValue = pgm_read_word_near(_listPointer + address * 3 + 1);
-//  Serial.print(" return value = ");
-//  Serial.print(returnValue);
-//  Serial.println("");
   return returnValue;
 };
 
+//This gets the delay in the propigation list, they are recursively totalled when loaded into the brolly objects
 int PropigationList::getDelay(int address){
   return pgm_read_word_near(_listPointer + address * 3 + 2);
 };
 
+//This is the object for the master sequence list.  It keeps track of what list we are using and the delay involved.
 MasterSequenceList::MasterSequenceList(int numberOfListLists,PropigationList* listListPointer){
     _currentList = 0;
     _lastList = numberOfListLists - 1;
@@ -194,14 +203,17 @@ MasterSequenceList::MasterSequenceList(int numberOfListLists,PropigationList* li
     transitionTime = 1000;
 };
 
+//This gets the number of elements in the current list
 int MasterSequenceList::getNumberOfElements(){
   return _listListPointer[_currentList].getNumberOfElements();
 };
 
+//This gets the number of elements in the previous list
 int MasterSequenceList::getLastNumberOfElements(){
   return _listListPointer[_lastList].getNumberOfElements();
 };
 
+//Move to the next list, wrapping around at the end.
 int MasterSequenceList::incrementList(){
   _lastList = _currentList;
   _currentList++;
@@ -212,30 +224,37 @@ int MasterSequenceList::incrementList(){
   return _currentList;
 };
 
+//Get the 'from' brolly at address from the current list
 int MasterSequenceList::getFrom(int address){
   return _listListPointer[_currentList].getFrom(address);
 };
 
+//Get the 'to' brolly at address from the current list
 int MasterSequenceList::getTo(int address){
   return _listListPointer[_currentList].getTo(address);
 };
 
+//get the delay at address for the current list 
 int MasterSequenceList::getDelay(int address){
   return _listListPointer[_currentList].getDelay(address);
 };
 
+//get the 'from' brolly at address from the previous list
 int MasterSequenceList::getLastFrom(int address){
   return _listListPointer[_lastList].getFrom(address);
 };
 
+//get the 'to' brolly at address from the previous list
 int MasterSequenceList::getLastTo(int address){
   return _listListPointer[_lastList].getTo(address);
 };
 
+//Get the delay from the previous list at address
 int MasterSequenceList::getLastDelay(int address){
   return _listListPointer[_lastList].getDelay(address);
 };
 
+//This gives you how far along in time you are in the current sequence list transition
 float MasterSequenceList::transitionRatio(){
   long timeInTransition = millis() - transitionBegan;
   float transitionRatio = float(timeInTransition) / float(transitionTime);
@@ -248,6 +267,7 @@ float MasterSequenceList::transitionRatio(){
   return transitionRatio;  
 };
 
+//This gives you the total delay 
 long MasterSequenceList::getTotalDelay(int address){
   for(int element = 0;element < getNumberOfElements();element++){
     if(getTo(element) == address){
@@ -257,6 +277,7 @@ long MasterSequenceList::getTotalDelay(int address){
   return 0;
 };
 
+//Gets the total delay for the last list
 long MasterSequenceList::getLastTotalDelay(int address){
   for(int element = 0;element < getLastNumberOfElements();element++){
     if(getLastTo(element) == address){
@@ -266,6 +287,7 @@ long MasterSequenceList::getLastTotalDelay(int address){
   return 0;
 };
 
+//Averages the delay between previous list and this one
 long MasterSequenceList::getAverageDelay(int address){
   if(transitionRatio() == 1){
     return getTotalDelay(address);

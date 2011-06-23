@@ -4,33 +4,42 @@
 #include "memory_color.h"
 #include "brolly.h"
 
-//This outputs the LED states when set to true.
-#define DEBUG true
-
+//These are the timer counters that allow you to cycle the sequences and colors
 unsigned long sequenceListTime;
 unsigned long colorListTime;
+
+//This allows you to serial print debugging out put every so many loops
 unsigned long loopCount = 0;
 unsigned long printingLoops = 60;
 
+//this is the setup loop.  Here we initalize brollies and the timer loops
+//Serial communication here is used for debugging output
 void setup() {
    Serial.begin(9600);
+   //This is the setup routine for the LED C library.  Everything I wrote writes back to an array that drives this.
    LEDSetup();
+   
+   //Here we initalize the brollies (because you can't have millis() in a constructor) 
    for(int i=0; i<NumLEDs;i++){
      brollies[i].initialize(i);
      brollies[i].setDelay();
    }
+   //Here we set the initial timers for the sequence rotator and the color rotator.
    sequenceListTime = millis();
    colorListTime = millis();
 };
 
 void loop() {
   
+  //Here we increment the debugging output loop
   loopCount++;
   
+  //This is the real meat of the matter.  The array is set here, and the colors advance to the next (faded, averaged, color)
   for(int i=0; i<NumLEDs;i++){
     brollies[i].advanceColor();
   };
   
+  //Here we print a few colors in the debugging output and the loop count.
   if(loopCount % printingLoops == 0){
     brollies[0].getColor().printColor();
     brollies[24].getColor().printColor();
@@ -39,18 +48,24 @@ void loop() {
     Serial.println("");
   };
   
+  //This decides when to move to the next color scheme.  The colors are temporarily averaged between the two schemes.  See memory_color.cpp for details
   if(millis() - colorListTime > 40000){
     colorListTime = millis();
     masterColorList.incrementList();
 //    Serial.println("**Next Color List**");
   };
   
+  //This is the meat of the matter, where the LED array gets updated and the serial bus gets pushed out.
   WriteLEDArray();
 
+  //This loop serial prints debugging output and moves to the next propigation scheme.
   if(loopCount % printingLoops == 0){
+    //The number on the right of the comparison here is the time to cycle to the next propagation scheme. (x)
     if(millis() - sequenceListTime > 2000){
+      //this resets the sequence base time so we wait another x seconds where x is set above.
       sequenceListTime = millis();
-//      masterSequenceList.incrementList();
+      //The line below moves to the next propagation scheme.  
+      //masterSequenceList.incrementList();
       for(int i=0; i<NumLEDs;i++){
         brollies[i].setDelay();
       };

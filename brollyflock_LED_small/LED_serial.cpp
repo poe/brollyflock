@@ -2,12 +2,17 @@
 #include "LED_serial.h"
 #include "memory_color.h"
 
+//This array is where the actual colors are stored.
+//Note that this takes up about a third of the (1 K!) stack.
 int LEDChannels[NumLEDs][3] = {0};
+
+//These are integers that get pushed down the serial bus
 int SB_CommandMode;
 int SB_RedCommand;
 int SB_GreenCommand;
 int SB_BlueCommand;
 
+//This method composes one packet for the serial bus, minus the color itself.
 void SB_SendPacket() {
     if (SB_CommandMode == B01) {
      SB_RedCommand = 120;
@@ -25,14 +30,17 @@ void SB_SendPacket() {
     while(!(SPSR & (1<<SPIF)));
  
 };
- 
+
+//Here we actually push out the serial bus 
 void WriteLEDArray() {
-  
+    
+    //Here we toggle the enable pin to reduce mystery occasional flicker.
     delayMicroseconds(15);
     digitalWrite(enablepin,HIGH); // reduce flicker
     delayMicroseconds(15);
     digitalWrite(enablepin,LOW);
  
+    
     SB_CommandMode = B00; // Write to PWM control registers
     for (int h = 0;h<NumLEDs;h++) {
 	  SB_RedCommand = LEDChannels[h][0];
@@ -70,6 +78,7 @@ Color getArrayColor(int brolly){
    return Color(red,green,blue);   
 };
 
+//Here is the simple setup for the LED pins and so on.
 void LEDSetup(){
    pinMode(datapin, OUTPUT);
    pinMode(latchpin, OUTPUT);
