@@ -1,3 +1,4 @@
+//all arduino libs require this
 #include "WProgram.h"
 #include "memory_color.h"
 
@@ -168,6 +169,12 @@ Color MasterColorList::getLastColorNow(int delayTime){
   return colorAverage;
 };
 
+/*
+Color MasterColorList::getAverageTotalTime(){
+  return getTotalTime() * transitionRatio + getLastTotalTime() * (1 - transitionRatio);
+};
+*/
+
 //This takes the last color (above) and the current color (above) offset for time and uses the transition to smoothly fade them
 Color MasterColorList::getSmoothColorNow(int delayTime){
   if(transitionRatio() == 1){
@@ -193,9 +200,9 @@ long MasterColorList::getLastTotalTime(){
 //They are then wrapped in Colorlists using sizeof for the size of the array.
 
 PROGMEM prog_int16_t devilish_color_list[] = {
-  1023,0,0,16000,
-  1023,200,0,16000,
-  0,0,0,16000,
+  1023,0,0,2000,
+  1023,200,0,2000,
+  0,0,0,2000,
 };
 
 ColorList devilish_color(devilish_color_list,sizeof(devilish_color_list) / (sizeof(prog_int16_t) * 4));
@@ -211,7 +218,7 @@ ColorList minty_color(minty_color_list,sizeof(minty_color_list) / (sizeof(prog_i
 PROGMEM prog_int16_t fire_color_list[] = {
   1023,0,0,2000,
   1023,1023,0,2000,
-  1023,1023,1023,2000,
+  1023,500,700,2000,
   1023,1023,0,2000,
 };
 
@@ -235,19 +242,66 @@ PROGMEM prog_int16_t cruise_color_list[] = {
 ColorList cruise_color(cruise_color_list,sizeof(cruise_color_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t slow_red_list[] = {
-  1023,0,0,5000,
-  0,0,0,5000,
+  0,0,0,3000,
+  0,0,0,3000,
+  0,0,0,3000,
+  1023,0,0,3000,
+  1023,500,20,3000,
 };
 
-ColorList slow_red_color(slow_red_list,sizeof(cruise_color_list) / (sizeof(prog_int16_t) * 4));
+ColorList slow_red_color(slow_red_list,sizeof(slow_red_list) / (sizeof(prog_int16_t) * 4));
+
+PROGMEM prog_int16_t flamey_purple_list[] = {
+  1023,0,0,500,
+  0,0,0,500,
+  1023,0,500,
+  
+};
+
+ColorList flamey_purple_color(flamey_purple_list,sizeof(flamey_purple_list) / (sizeof(prog_int16_t) * 4));
+
+PROGMEM prog_int16_t rave_bow_list[] = {
+  1023,0,0,10,
+  0,1023,0,10,
+  0,0,1023,10,  
+};
+
+ColorList rave_bow_color(rave_bow_list,sizeof(rave_bow_list) / (sizeof(prog_int16_t) * 4));
+
+PROGMEM prog_int16_t glitter_list[] = {
+  1023,0,0,10,
+  0,0,0,1432,
+  0,0,0,1432,
+  0,0,0,1432,
+  1023,600,0,10,
+  0,0,0,1432,
+  0,0,0,1432,
+  0,0,0,1432,
+  600,0,1023,10,  
+  0,0,0,1432,
+  0,0,0,1432,
+  0,0,0,1432,
+};
+
+ColorList glitter_color(glitter_list,sizeof(glitter_list) / (sizeof(prog_int16_t) * 4));
+
+PROGMEM prog_int16_t flash_list[] = {
+  1023,1023,1023,1,
+  0,0,0,1432,
+  0,0,0,1432,
+  0,0,0,1432,
+};
+
+ColorList flash_color(flash_list,sizeof(flash_list) / (sizeof(prog_int16_t) * 4));
 
 //ColorList listOfColorLists[] = {devilish_color,minty_color,fire_color,ocean_color,cruise_color,slow_red_color};
-ColorList listOfColorLists[] = {devilish_color,minty_color};
+//ColorList listOfColorLists[] = {devilish_color,flamey_purple_color,fire_color,slow_red_color};
+ColorList listOfColorLists[] = {devilish_color};
 
 //This is the object for the list of color lists.  
 MasterColorList::MasterColorList(int numberOfColorLists,ColorList* listOfColorListsPointer){
     //This is how long it fades between color schemes
-    transitionTime = 10000;
+    transitionTime = 1000;
     //This keeps track of which color list we are on
     _currentList = 0;
     //This is the number of the last color list in the list of lists.

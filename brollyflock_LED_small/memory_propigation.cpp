@@ -1,4 +1,5 @@
 #include "memory_propigation.h"
+#include "memory_color.h"
 
 //Here is the flash ram for some propigation lists
 //It contains the from brolly and the to brolly indexes, as well as a delay
@@ -108,6 +109,58 @@ PROGMEM prog_int16_t sync_list[] = {
 
 PropigationList sync(sync_list,sizeof(sync_list) / (sizeof(prog_int16_t) * 3));
 
+PROGMEM prog_int16_t bloom_list[] = {
+   0,1,500,
+   0,2,500,
+   0,3,500,
+   0,4,500,
+   0,5,500,
+   0,6,500,
+   0,7,500,
+   0,8,500,
+   0,9,500,
+   0,10,500,
+   0,11,500,
+   0,12,500,
+   0,13,500,
+   0,14,500,
+   0,15,500,
+   0,16,500,
+   0,17,500,
+   0,18,500,
+   0,19,500,
+   0,20,500,
+   0,21,500,
+   0,22,500,
+   0,23,500,
+   0,24,500,
+   0,25,500,
+   0,26,500,
+   0,27,500,
+   0,28,500,
+   0,29,500,
+   0,30,500,
+   0,31,500,
+   0,32,500,
+   0,33,500,
+   0,34,500,
+   0,35,500,
+   0,36,500,
+   0,37,500,
+   0,38,500,
+   0,39,500,
+   0,40,500,
+   0,41,500,
+   0,42,500,
+   0,43,500,
+   0,44,500,
+   0,45,500,
+   0,46,500,
+   0,47,500,
+};
+
+PropigationList bloom(bloom_list,sizeof(bloom_list) / (sizeof(prog_int16_t) * 3));
+
 PROGMEM prog_int16_t reverse_order_list[] = {
    47,46,100,
    46,45,100,
@@ -160,8 +213,61 @@ PROGMEM prog_int16_t reverse_order_list[] = {
 
 PropigationList reverse_order(reverse_order_list,sizeof(reverse_order_list) / (sizeof(prog_int16_t) * 3));
 
+PROGMEM prog_int16_t slow_list[] = {
+   0,1,2000,
+   1,2,2000,
+   2,3,2000,
+   3,4,2000,
+   4,5,2000,
+   5,6,2000,
+   6,7,2000,
+   7,8,2000,
+   8,9,2000,
+   9,10,2000,
+   10,11,2000,
+   11,12,2000,
+   12,13,2000,
+   13,14,2000,
+   14,15,2000,
+   15,16,2000,
+   16,17,2000,
+   17,18,2000,
+   18,19,2000,
+   19,20,2000,
+   20,21,2000,
+   21,22,2000,
+   22,23,2000,
+   23,24,2000,
+   24,25,2000,
+   25,26,2000,
+   26,27,2000,
+   27,28,2000,
+   28,29,2000,
+   29,30,2000,
+   30,31,2000,
+   31,32,2000,
+   32,33,2000,
+   33,34,2000,
+   34,35,2000,
+   35,36,2000,
+   36,37,2000,
+   37,38,2000,
+   38,39,2000,
+   39,40,2000,
+   40,41,2000,
+   41,42,2000,
+   42,43,2000,
+   43,44,2000,
+   44,45,2000,
+   45,46,2000,
+   46,47,2000,
+};
+
+PropigationList slow(slow_list,sizeof(slow_list) / (sizeof(prog_int16_t) * 3));
+
+
 //Here is the master sequence list
-PropigationList listOfLists[] = {reverse_order,in_order,sync};
+PropigationList listOfLists[] = {slow};
 
 //Here is the object wrapper for the master sequence list
 MasterSequenceList masterSequenceList(sizeof(listOfLists) / sizeof(PropigationList),listOfLists);
@@ -292,6 +398,6 @@ long MasterSequenceList::getAverageDelay(int address){
   if(transitionRatio() == 1){
     return getTotalDelay(address);
   }
-  return getTotalDelay(address) * transitionRatio() + getLastTotalDelay(address) * (1 - transitionRatio());
+  return ((getTotalDelay(address) % masterColorList.getTotalTime()) * transitionRatio() + (getLastTotalDelay(address) % masterColorList.getTotalTime()) * (1 - transitionRatio()));
 };
 

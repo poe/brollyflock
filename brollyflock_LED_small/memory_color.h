@@ -81,6 +81,8 @@ class MasterColorList{
     //This gives you how far into the transition between color lists you are
     float transitionRatio();
     
+    long getAverageTotalTime();
+    
     //This gives you the total time in the current list
     long getTotalTime();
     

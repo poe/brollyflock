@@ -3,6 +3,7 @@
 #include "memory_propigation.h"
 #include "memory_color.h"
 #include "brolly.h"
+#include "intercom.h"
 
 //These are the timer counters that allow you to cycle the sequences and colors
 unsigned long sequenceListTime;
@@ -29,8 +30,11 @@ void setup() {
    colorListTime = millis();
 };
 
+int button_state = 0;
+
 void loop() {
-  
+  button_state = listen_from_firectl();
+    
   //Here we increment the debugging output loop
   loopCount++;
   
@@ -41,37 +45,39 @@ void loop() {
   
   //Here we print a few colors in the debugging output and the loop count.
   if(loopCount % printingLoops == 0){
-    brollies[0].getColor().printColor();
-    brollies[24].getColor().printColor();
-    Serial.print(" loopCount = ");  
-    Serial.print(loopCount);
-    Serial.println("");
+//    brollies[0].getColor().printColor();
+//    brollies[24].getColor().printColor();
+//    Serial.print(" transitionRatio = ");
+//    Serial.print(masterSequenceList.transitionRatio());
+//    Serial.print(" loopCount = ");  
+//    Serial.print(loopCount);
+//    Serial.println("");
   };
   
   //This decides when to move to the next color scheme.  The colors are temporarily averaged between the two schemes.  See memory_color.cpp for details
-  if(millis() - colorListTime > 40000){
+  if(millis() - colorListTime > 4000 || button_state == BUTTONTWO || button_state == BUTTONTHREE || button_state == BUTTONONE){
     colorListTime = millis();
     masterColorList.incrementList();
 //    Serial.println("**Next Color List**");
+    button_state = 0;
   };
   
   //This is the meat of the matter, where the LED array gets updated and the serial bus gets pushed out.
   WriteLEDArray();
-
-  //This loop serial prints debugging output and moves to the next propigation scheme.
-  if(loopCount % printingLoops == 0){
-    //The number on the right of the comparison here is the time to cycle to the next propagation scheme. (x)
-    if(millis() - sequenceListTime > 2000){
-      //this resets the sequence base time so we wait another x seconds where x is set above.
-      sequenceListTime = millis();
-      //The line below moves to the next propagation scheme.  
-      //masterSequenceList.incrementList();
-      for(int i=0; i<NumLEDs;i++){
-        brollies[i].setDelay();
-      };
-//      Serial.println("**Next Propigation List**");
+  
+  //The number on the right of the comparison here is the time to cycle to the next propagation scheme. (x)
+  if(millis() - sequenceListTime > 300000){
+    //this resets the sequence base time so we wait another x seconds where x is set above.
+    sequenceListTime = millis();
+    //The line below moves to the next propagation scheme.  
+    masterSequenceList.incrementList();
+    for(int i=0; i<NumLEDs;i++){
+      brollies[i].setDelay();
     };
+//    Serial.println("**Next Propigation List**");
+    button_state = 0;
   };
+
 
 }
 
