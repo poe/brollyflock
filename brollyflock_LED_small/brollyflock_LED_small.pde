@@ -13,6 +13,8 @@ unsigned long colorListTime;
 unsigned long loopCount = 0;
 unsigned long printingLoops = 60;
 
+unsigned long flashDelay;
+
 //this is the setup loop.  Here we initalize brollies and the timer loops
 //Serial communication here is used for debugging output
 void setup() {
@@ -28,9 +30,17 @@ void setup() {
    //Here we set the initial timers for the sequence rotator and the color rotator.
    sequenceListTime = millis();
    colorListTime = millis();
+   flashDelay = millis() + 2000;
+   randomSeed(analogRead(0));
 };
 
 int button_state = 0;
+
+int flashingLEDNumber = -1;
+
+Color flashingLEDStoredValue;
+
+boolean flashing;
 
 void loop() {
   button_state = listen_from_firectl();
@@ -55,18 +65,45 @@ void loop() {
   };
   
   //This decides when to move to the next color scheme.  The colors are temporarily averaged between the two schemes.  See memory_color.cpp for details
-  if(millis() - colorListTime > 4000 || button_state == BUTTONTWO || button_state == BUTTONTHREE || button_state == BUTTONONE){
+  if(millis() - colorListTime > 30000){
     colorListTime = millis();
     masterColorList.incrementList();
 //    Serial.println("**Next Color List**");
-    button_state = 0;
   };
   
+  if(button_state == BUTTONTWO || button_state == BUTTONTHREE || button_state == BUTTONONE){
+    flashing = true;
+    button_state = 0;
+    flashDelay = millis();
+    flashingLEDNumber = random(NumLEDs);
+    if(0 < flashingLEDNumber < NumLEDs){
+      flashingLEDStoredValue = brollies[flashingLEDNumber].getColor();
+      brollies[flashingLEDNumber].setColor(Color(1023,1023,1023));
+    };
+  };
+  
+  if(millis() - flashDelay < 2000){
+    if(0 < flashingLEDNumber < NumLEDs){
+      brollies[flashingLEDNumber].setColor(flashingLEDStoredValue);
+    };
+    flashingLEDNumber = random(NumLEDs);
+    if(0 < flashingLEDNumber < NumLEDs){
+      flashingLEDStoredValue = brollies[flashingLEDNumber].getColor();
+      brollies[flashingLEDNumber].setColor(Color(1023,1023,1023));
+    }
+  }
+  else{
+    if(0 < flashingLEDNumber < NumLEDs){
+      brollies[flashingLEDNumber].setColor(flashingLEDStoredValue);
+    };
+    flashingLEDNumber = -1;  //set it outside the range of the LEDs so the above conditional no longer gets called.
+  }
+    
   //This is the meat of the matter, where the LED array gets updated and the serial bus gets pushed out.
   WriteLEDArray();
   
   //The number on the right of the comparison here is the time to cycle to the next propagation scheme. (x)
-  if(millis() - sequenceListTime > 300000){
+/*  if(millis() - sequenceListTime > 300000){
     //this resets the sequence base time so we wait another x seconds where x is set above.
     sequenceListTime = millis();
     //The line below moves to the next propagation scheme.  
@@ -77,7 +114,7 @@ void loop() {
 //    Serial.println("**Next Propigation List**");
     button_state = 0;
   };
-
+*/
 
 }
 

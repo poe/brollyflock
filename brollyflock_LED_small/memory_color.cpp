@@ -200,84 +200,84 @@ long MasterColorList::getLastTotalTime(){
 //They are then wrapped in Colorlists using sizeof for the size of the array.
 
 PROGMEM prog_int16_t devilish_color_list[] = {
-  1023,0,0,2000,
-  1023,200,0,2000,
-  0,0,0,2000,
+  1023,0,0,2367,
+  1023,200,0,2367,
+  0,0,0,2367,
 };
 
 ColorList devilish_color(devilish_color_list,sizeof(devilish_color_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t minty_color_list[] = {
-  0,1023,1023,2000,
-  0,1023,0,2000,
-  0,0,1023,2000,
+  0,1023,1023,2367,
+  0,1023,0,2367,
+  0,0,1023,2367,
 };
 
 ColorList minty_color(minty_color_list,sizeof(minty_color_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t fire_color_list[] = {
-  1023,0,0,2000,
-  1023,1023,0,2000,
-  1023,500,700,2000,
-  1023,1023,0,2000,
+  1023,0,0,2367,
+  1023,300,0,2367,
+  1023,500,700,2367,
+  1023,0,300,2367,
 };
 
 ColorList fire_color(fire_color_list,sizeof(fire_color_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t ocean_color_list[] = {
-  0,1023,1023,2000,
-  0,1023,0,2000,
-  500,1023,0,2000,
-  0,0,1023,2000,  
+  0,1023,1023,2367,
+  0,1023,0,2367,
+  500,1023,0,2367,
+  0,0,1023,2367,  
 };
 
 ColorList ocean_color(ocean_color_list,sizeof(ocean_color_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t cruise_color_list[] = {
-  1023,1023,0,2000,
-  1023,1023,1023,2000,
-  0,1023,1023,2000,
+  1023,1023,0,2367,
+  1023,1023,1023,2367,
+  0,1023,1023,2367,
 };
 
 ColorList cruise_color(cruise_color_list,sizeof(cruise_color_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t slow_red_list[] = {
-  0,0,0,3000,
-  0,0,0,3000,
-  0,0,0,3000,
-  1023,0,0,3000,
-  1023,500,20,3000,
+  0,0,0,3187,
+  0,0,0,3187,
+  0,0,0,3187,
+  1023,0,0,3187,
+  1023,500,20,3187,
 };
 
 ColorList slow_red_color(slow_red_list,sizeof(slow_red_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t flamey_purple_list[] = {
-  1023,0,0,500,
-  0,0,0,500,
-  1023,0,500,
+  1023,0,0,529,
+  0,0,0,529,
+  1023,0,529,
   
 };
 
 ColorList flamey_purple_color(flamey_purple_list,sizeof(flamey_purple_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t rave_bow_list[] = {
-  1023,0,0,10,
-  0,1023,0,10,
-  0,0,1023,10,  
+  1023,0,0,11,
+  0,1023,0,11,
+  0,0,1023,11,  
 };
 
 ColorList rave_bow_color(rave_bow_list,sizeof(rave_bow_list) / (sizeof(prog_int16_t) * 4));
 
 PROGMEM prog_int16_t glitter_list[] = {
-  1023,0,0,10,
+  1023,0,0,11,
   0,0,0,1432,
   0,0,0,1432,
   0,0,0,1432,
-  1023,600,0,10,
+  1023,600,0,11,
   0,0,0,1432,
   0,0,0,1432,
   0,0,0,1432,
-  600,0,1023,10,  
+  600,0,1023,11,  
   0,0,0,1432,
   0,0,0,1432,
   0,0,0,1432,
@@ -294,9 +294,17 @@ PROGMEM prog_int16_t flash_list[] = {
 
 ColorList flash_color(flash_list,sizeof(flash_list) / (sizeof(prog_int16_t) * 4));
 
+PROGMEM prog_int16_t white_blink_list[] = {
+  1023,1023,1023,100,
+  0,0,0,100,
+};
+
+ColorList white_blink_color(white_blink_list,sizeof(white_blink_list) / (sizeof(prog_int16_t) * 4));
+
+
 //ColorList listOfColorLists[] = {devilish_color,minty_color,fire_color,ocean_color,cruise_color,slow_red_color};
 //ColorList listOfColorLists[] = {devilish_color,flamey_purple_color,fire_color,slow_red_color};
-ColorList listOfColorLists[] = {devilish_color};
+ColorList listOfColorLists[] = {fire_color,devilish_color,flamey_purple_color,flash_color};
 
 //This is the object for the list of color lists.  
 MasterColorList::MasterColorList(int numberOfColorLists,ColorList* listOfColorListsPointer){
