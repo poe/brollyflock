@@ -1,0 +1,10 @@
+Centipede	KEYWORD1
+initialize	KEYWORD2
+pinMode		KEYWORD2
+pinPullup	KEYWORD2
+digitalWrite	KEYWORD2
+digitalRead	KEYWORD2
+portMode	KEYWORD2
+portPullup	KEYWORD2
+portWrite	KEYWORD2
+portRead	KEYWORD2
